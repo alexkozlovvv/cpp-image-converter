@@ -80,7 +80,7 @@ bool SaveBMP(const Path& file, const Image& image) {
 
     if(!ofs.good()) {
         // Обработать ошибку чтения из файла
-        return {};
+        return false;
     }
     
     /* Записываем данные */
