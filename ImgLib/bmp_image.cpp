@@ -77,6 +77,11 @@ bool SaveBMP(const Path& file, const Image& image) {
     /* Записываем заголовки */
     ofs.write(reinterpret_cast<char*>(&file_feader), sizeof(file_feader));
     ofs.write(reinterpret_cast<char*>(&info_header), sizeof(info_header));
+
+    if(!ofs.good()) {
+        // Обработать ошибку чтения из файла
+        return {};
+    }
     
     /* Записываем данные */
     std::vector<char> buff(stride);
@@ -89,8 +94,12 @@ bool SaveBMP(const Path& file, const Image& image) {
             buff[x * 3 + 2] = static_cast<char>(line[x].r);
         }
         ofs.write(buff.data(), stride);
+        if(!ofs.good()) {
+            // Обработать ошибку чтения из файла
+            return false;
+        }
     }
-    return ofs.good();
+    return true;
 }
 
 Image LoadBMP(const Path& file) {
@@ -107,7 +116,18 @@ Image LoadBMP(const Path& file) {
 
     /* Читаем заголовки */
     ifs.read(reinterpret_cast<char*>(&file_feader), sizeof(file_feader));
+
+    if(!ifs.good() || (file_feader.sign[0] != 'B' || file_feader.sign[1] != 'M')) {
+        // Обработать ошибку чтения из файла и проверки корректности сигнатуры заголовка
+        return {};
+    }
+
     ifs.read(reinterpret_cast<char*>(&info_header), sizeof(info_header));
+
+    if(!ifs.good()) {
+        // Обработать ошибку чтения из файла
+        return {};
+    }
 
     const auto stride = GetBMPStride(info_header.image_width);
 
@@ -118,15 +138,15 @@ Image LoadBMP(const Path& file) {
     for (int y = info_header.image_height - 1; y >= 0; --y) {
         Color* line = result.GetLine(y);
         ifs.read(buff.data(), stride);
+        if(!ifs.good()) {
+            // Обработать ошибку чтения из файла
+            return {};
+        }
         for (int x = 0; x < info_header.image_width; ++x) {
             line[x].b = static_cast<byte>(buff[x * 3 + 0]);
             line[x].g = static_cast<byte>(buff[x * 3 + 1]);
             line[x].r = static_cast<byte>(buff[x * 3 + 2]);
         }
-    }
-    if(!ifs.good()) {
-        // Обработать ошибку чтения из файла
-        return {};
     }
     return result;
 }
