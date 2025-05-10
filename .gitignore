@@ -1,0 +1,6 @@
+# VScode files
+.vscode/*
+build/*
+olds.cpp
+
+Debug/*
