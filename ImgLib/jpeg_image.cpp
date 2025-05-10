@@ -39,8 +39,7 @@ void SaveScanlineToJpeg(JSAMPLE* row, int y, const Image& in_image) {
 }
 
 // В эту функцию вставлен код примера из библиотеки libjpeg.
-// Измените его, чтобы адаптировать к переменным file и image.
-// Задание качества уберите - будет использовано качество по умолчанию
+// Задание качества уберано - будет использовано качество по умолчанию
 bool SaveJPEG(const Path& file, const Image& image) {
     /* This struct contains the JPEG compression parameters and pointers to
     * working space (which is allocated as needed by the JPEG library).
